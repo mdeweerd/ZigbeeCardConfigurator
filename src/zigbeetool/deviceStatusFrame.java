@@ -202,17 +202,18 @@ public class deviceStatusFrame extends javax.swing.JFrame {
             jTextField2.setText("");
             jTextField3.setText("");
             jTextField5.setText("");
+            final ZigBeeToolView view=ZigBeeToolApp.getApplication().view;
             Thread.sleep(600);
-            String d= ZigBeeToolApp.getApplication().view.sendCmd(REQ_PAN_ID, 1);
+            String d= view.sendCmd(REQ_PAN_ID, 1);
             jTextField1.setText(d);
             Thread.sleep(600);
-            String d1 = ZigBeeToolApp.getApplication().view.sendCmd(REQ_EXT_PAN, 1);
+            String d1 = view.sendCmd(REQ_EXT_PAN, 1);
             jTextField2.setText(d1);
             Thread.sleep(600);
-            String d2 = ZigBeeToolApp.getApplication().view.sendCmd(REQ_IEEE_ADDRS, 1);
+            String d2 = view.sendCmd(REQ_IEEE_ADDRS, 1);
             jTextField3.setText(d2);
             Thread.sleep(600);
-            String d3 = ZigBeeToolApp.getApplication().view.sendCmd(CHNL_NO, 1);
+            String d3 = view.sendCmd(CHNL_NO, 1);
             jTextField5.setText(d3);
 
             jProgressBar2.setVisible(true);

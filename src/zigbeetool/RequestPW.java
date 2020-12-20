@@ -21,7 +21,7 @@ public class RequestPW extends java.awt.Dialog {
     public RequestPW(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        passTxtField.setText("betaperl");
+        passTxtField.setText("betapearl");
     }
 
     /** This method is called from within the constructor to

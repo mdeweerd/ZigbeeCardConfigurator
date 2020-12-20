@@ -11,7 +11,7 @@ public class ZigBeeToolAboutBox extends javax.swing.JDialog {
     public ZigBeeToolAboutBox(java.awt.Frame parent) {
         super(parent);
         initComponents();
-        getRootPane().setDefaultButton(closeButton);
+        this.rootPane.setDefaultButton(closeButton);
     }
 
     @Action public void closeAboutBox() {

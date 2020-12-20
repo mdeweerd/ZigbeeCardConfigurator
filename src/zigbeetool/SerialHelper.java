@@ -187,7 +187,6 @@ public class SerialHelper implements Runnable , SerialPortEventListener {
     //post: processing on the data it reads
     @SuppressWarnings("CallToPrintStackTrace")
     public void serialEvent(SerialPortEvent evt) {
-        byte[] dataBuf = new byte[9];
         int data;
         switch(evt.getEventType())
         {

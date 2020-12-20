@@ -24,7 +24,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
 package prodprogrammer.fileutilities;
 
 import java.io.File;
@@ -45,90 +44,88 @@ import java.util.List;
 /* Partha: Modified the name to FileUilities and added more functions to it.
  *          copy, splitFileNames, deleteDirectory
  */
-
 public class FileUtilities {
-  private String fullPath;
-  private char pathSeparator, extensionSeparator;
 
-  public FileUtilities(String str, char sep, char ext) {
-    fullPath = str;
-    pathSeparator = sep;
-    extensionSeparator = ext;
-  }
+    private final String fullPath;
+    private final char pathSeparator;
+    private final char extensionSeparator;
 
-  public String extension() {
-    int dot = fullPath.lastIndexOf(extensionSeparator);
-    return fullPath.substring(dot + 1);
-  }
+    public FileUtilities(String str, char sep, char ext) {
+        fullPath = str;
+        pathSeparator = sep;
+        extensionSeparator = ext;
+    }
 
-  public String fileName() { // gets filename without extension
-    int dot = fullPath.lastIndexOf(extensionSeparator);
-    int sep = fullPath.lastIndexOf(pathSeparator);
-    return fullPath.substring(sep + 1, dot);
-  }
+    public String extension() {
+        int dot = fullPath.lastIndexOf(extensionSeparator);
+        return fullPath.substring(dot + 1);
+    }
 
-  public String path() {
-    int sep = fullPath.lastIndexOf(pathSeparator);
-    return fullPath.substring(0, sep);
-  }
+    public String fileName() { // gets filename without extension
+        int dot = fullPath.lastIndexOf(extensionSeparator);
+        int sep = fullPath.lastIndexOf(pathSeparator);
+        return fullPath.substring(sep + 1, dot);
+    }
+
+    public String path() {
+        int sep = fullPath.lastIndexOf(pathSeparator);
+        return fullPath.substring(0, sep);
+    }
 
     // Copies src file to dst file.
-   // If the dst file does not exist, it is created
+    // If the dst file does not exist, it is created
     public static void copy(File src, File dst) throws IOException {
-            InputStream in = new FileInputStream(src);
-            OutputStream out = new FileOutputStream(dst);
-            // Transfer bytes from in to out
-            byte[] buf = new byte[1024];
-            int len;
-            while ((len = in.read(buf)) > 0) {
-                    out.write(buf, 0, len);
-            }
-            in.close();
-            out.close();
-    }
-
-    public static List splitFileNames(String sFileNames){
-      List lstFileName= new ArrayList();
-      int currentindex=-1;
-      int previousindex=-1;
-      String osName= System.getProperty("os.name");
-
-      do{
-          currentindex=sFileNames.indexOf("\n",previousindex+1);
-          if(currentindex!=-1){
-              Object stringobj=null;
-              if(osName.equalsIgnoreCase("linux")){
-                    stringobj= new String(sFileNames.substring(previousindex+1, currentindex));
-              }
-              else{
-                    stringobj= new String(sFileNames.substring(previousindex+1, currentindex-1));
-              }
-              if((currentindex-previousindex)<5){
-                  previousindex=currentindex;
-                  continue;
-              }
-              lstFileName.add(stringobj);
-              previousindex=currentindex;
-          }
-      }while(currentindex!=-1);
-
-       return lstFileName;
-    }
-
-     static public boolean deleteDirectory(File path) {
-        if( path.exists() ) {
-          File[] files = path.listFiles();
-          for(int i=0; i<files.length; i++) {
-             if(files[i].isDirectory()) {
-               deleteDirectory(files[i]);
-             }
-             else {
-               files[i].delete();
-             }
-          }
+        InputStream in = new FileInputStream(src);
+        OutputStream out = new FileOutputStream(dst);
+        // Transfer bytes from in to out
+        byte[] buf = new byte[1024];
+        int len;
+        while ((len = in.read(buf)) > 0) {
+            out.write(buf, 0, len);
         }
-        return( path.delete() );
-      }
+        in.close();
+        out.close();
+    }
 
+    public static List splitFileNames(String sFileNames) {
+        List lstFileName = new ArrayList();
+        int currentindex;
+        int previousindex = -1;
+        String osName = System.getProperty("os.name");
+
+        do {
+            currentindex = sFileNames.indexOf("\n", previousindex + 1);
+            if (currentindex != -1) {
+                Object stringobj;
+                if (osName.equalsIgnoreCase("linux")) {
+                    stringobj = new String(sFileNames.substring(previousindex + 1, currentindex));
+                } else {
+                    stringobj = new String(sFileNames.substring(previousindex + 1, currentindex - 1));
+                }
+                if ((currentindex - previousindex) < 5) {
+                    previousindex = currentindex;
+                    continue;
+                }
+                lstFileName.add(stringobj);
+                previousindex = currentindex;
+            }
+        } while (currentindex != -1);
+
+        return lstFileName;
+    }
+
+    static public boolean deleteDirectory(File path) {
+        if (path.exists()) {
+            File[] files = path.listFiles();
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    deleteDirectory(file);
+                } else {
+                    file.delete();
+                }
+            }
+        }
+        return (path.delete());
+    }
 
 }

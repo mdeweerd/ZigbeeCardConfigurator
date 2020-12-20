@@ -94,17 +94,17 @@ public class ZigBeeToolView extends FrameView {
 //            StyleConstants.setBold(Rx, true);
 
         // status bar initialization - message timeout, idle icon and busy animation, etc
-        ResourceMap resourceMap = getResourceMap();
-        int messageTimeout = resourceMap.getInteger("StatusBar.messageTimeout");
+        ResourceMap statusResourceMap = getResourceMap();
+        int messageTimeout = statusResourceMap.getInteger("StatusBar.messageTimeout");
         messageTimer = new Timer(messageTimeout, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //  statusMessageLabel.setText("");
             }
         });
         messageTimer.setRepeats(false);
-        int busyAnimationRate = resourceMap.getInteger("StatusBar.busyAnimationRate");
+        int busyAnimationRate = statusResourceMap.getInteger("StatusBar.busyAnimationRate");
         for (int i = 0; i < busyIcons.length; i++) {
-            busyIcons[i] = resourceMap.getIcon("StatusBar.busyIcons[" + i + "]");
+            busyIcons[i] = statusResourceMap.getIcon("StatusBar.busyIcons[" + i + "]");
         }
         busyIconTimer = new Timer(busyAnimationRate, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -112,7 +112,7 @@ public class ZigBeeToolView extends FrameView {
                 // statusAnimationLabel.setIcon(busyIcons[busyIconIndex]);
             }
         });
-        idleIcon = resourceMap.getIcon("StatusBar.idleIcon");
+        idleIcon = statusResourceMap.getIcon("StatusBar.idleIcon");
         // statusAnimationLabel.setIcon(idleIcon);
         //  progressBar.setVisible(false);
 
@@ -135,7 +135,7 @@ public class ZigBeeToolView extends FrameView {
                     progressBar.setVisible(false);
                     progressBar.setValue(0);
                 } else if ("message".equals(propertyName)) {
-                    String text = (String) (evt.getNewValue());
+                    //String text = (String) (evt.getNewValue());
                     // statusMessageLabel.setText((text == null) ? "" : text);
                     messageTimer.restart();
                 } else if ("progress".equals(propertyName)) {
@@ -743,7 +743,8 @@ public class ZigBeeToolView extends FrameView {
         if (connectBtn.getText().contentEquals("Connect")) {
             boolean connect = false;
             try {
-                connect = serialHelper.connect((String) cmbComSelector.getSelectedItem(), 9600);
+                // Changed to 115200 as the ZNP is set to this speed.
+                connect = serialHelper.connect((String) cmbComSelector.getSelectedItem(), 115200);
             } catch (IOException ex) {
                 Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -751,28 +752,15 @@ public class ZigBeeToolView extends FrameView {
                 connectBtn.setText("Disconnect");
                 connectBtn.setIcon(resourceMap.getIcon("disconnect.icon"));
                 EnableDisableCalButtons(true);
-                final responseProcessor r = new responseProcessor();
 
-                if (sendThis(IEEE_ADDRS, r.OP_IEEE_ADDRS)) {
-                    byte[] desc = new byte[resp.dataBuffer.length];
-                    desc = resp.dataBuffer;
-                    String p = "";
-                    String q = "";
-                    for (int b = 1; b < desc.length; b++) {
-                        q = Byte.toString(desc[b]);
-                        q = Long.toHexString(Long.parseLong(q));
-                        if (q.length() > 2) {
-                            q = q.substring(q.length() - 2, q.length());
-                        }
-                        if (q.length() == 1) {
-                            q = "0".concat(q);
-                        }
-                        p = p.concat(q + " ");
+                if (sendThis(IEEE_ADDRS, responseProcessor.OP_IEEE_ADDRS)) {
+                    StringBuilder p=new StringBuilder(3*9);
+                    for (int b = 1; b < resp.dataBuffer.length; b++) {
+                        p.append(String.format("%02X ", resp.dataBuffer[b]));
                     }
-                    lblStatus.setText("Connected device (IEEE Address) - " + p.toUpperCase());
+                    lblStatus.setText("Connected device (IEEE Address) - " + p.toString());
                     lblStatus.setForeground(Color.BLUE);
                 }
-
             }
         } else {
             //    startTread(false);
@@ -788,7 +776,6 @@ public class ZigBeeToolView extends FrameView {
 }//GEN-LAST:event_connectBtnActionPerformed
 
     private void sendBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sendBtnActionPerformed
-
         if (cmdTxtField.getText().contains("")) {
             JOptionPane.showMessageDialog(this.getFrame(), "Please provide the command. \nFor eg: FE0141000040 is for reset", "Error", JOptionPane.ERROR_MESSAGE);
         } else {
@@ -953,41 +940,41 @@ public class ZigBeeToolView extends FrameView {
                             {
                                 lblStatus("Resetting device...", Color.blue, 0);
 
-                                sent = sendThis(SYST_RST, r.OP_RESET);
+                                sent = sendThis(SYST_RST, responseProcessor.OP_RESET);
                                 Thread.sleep(1000);
                             }
 
                             //if(sent)
                             {
                                 lblStatus("Log Coordinates...", Color.blue, 0);
-                                sendThis(LOG_CORD, r.OP_WR_LOG_TYPE);
+                                sendThis(LOG_CORD, responseProcessor.OP_WR_LOG_TYPE);
                                 Thread.sleep(1000);
                             }
                             // if(sent)
                             {
                                 lblStatus("Setting Extended PAN IDs...", Color.blue, 0);
-                                sent = sendThis(EPID, r.OP_WR_EPAN_ID);
+                                sent = sendThis(EPID, responseProcessor.OP_WR_EPAN_ID);
                                 Thread.sleep(1000);
                             }
                             //if(sent)
                             {
                                 lblStatus("Setting PAN IDs...", Color.blue, 0);
 
-                                sent = sendThis(PANID, r.OP_WR_PAN_ID);
+                                sent = sendThis(PANID, responseProcessor.OP_WR_PAN_ID);
                                 Thread.sleep(1000);
                             }
                             //if(sent)
                             {
                                 lblStatus("Setting AF Registers...", Color.blue, 0);
 
-                                sent = sendThis(AF_reg, r.OP_AF_REG);
+                                sent = sendThis(AF_reg, responseProcessor.OP_AF_REG);
                                 Thread.sleep(1000);
                             }
                             // if(sent)
                             {
                                 lblStatus("Finalizing Configuration...", Color.blue, 0);
 
-                                sent = sendThis(ZDO_STRT, r.OP_ZDO_START);
+                                sent = sendThis(ZDO_STRT, responseProcessor.OP_ZDO_START);
                                 Thread.sleep(1000);
                             }
 
@@ -1005,31 +992,31 @@ public class ZigBeeToolView extends FrameView {
 
                         } else if (rBtnRouter.isSelected()) {
                             lblStatus("Resetting device...", Color.blue, 0);
-                            sendThis(SYST_RST, r.OP_RESET);
+                            sendThis(SYST_RST, responseProcessor.OP_RESET);
                             Thread.sleep(1000);
                             lblStatus("Writing Config...", Color.blue, 0);
-                            sendThis(WRT_CONFG, r.OP_WR_CFG);              // need to confirm the op command
+                            sendThis(WRT_CONFG, responseProcessor.OP_WR_CFG);              // need to confirm the op command
                             Thread.sleep(1000);
                             lblStatus("Resetting device...", Color.blue, 0);
 
-                            sendThis(SYST_RST, r.OP_RESET);
+                            sendThis(SYST_RST, responseProcessor.OP_RESET);
                             Thread.sleep(1000);
                             lblStatus("Log Coordinates...", Color.blue, 0);
-                            sendThis(ROUTER, r.OP_WR_LOG_TYPE);
+                            sendThis(ROUTER, responseProcessor.OP_WR_LOG_TYPE);
                             Thread.sleep(1000);
                             lblStatus("Setting Extended PAN IDs...", Color.blue, 0);
-                            sendThis(EPID, r.OP_WR_EPAN_ID);
+                            sendThis(EPID, responseProcessor.OP_WR_EPAN_ID);
                             Thread.sleep(1000);
                             lblStatus("Setting PAN IDs...", Color.blue, 0);
 
-                            sendThis(PANID, r.OP_WR_PAN_ID);
+                            sendThis(PANID, responseProcessor.OP_WR_PAN_ID);
                             Thread.sleep(1000);
                             lblStatus("Setting AF Registers...", Color.blue, 0);
 
-                            sendThis(AF_REG_Router, r.OP_AF_REG);
+                            sendThis(AF_REG_Router, responseProcessor.OP_AF_REG);
                             Thread.sleep(1000);
                             lblStatus("Finalizing Configuration...", Color.blue, 0);
-                            sendThis(ZDO_STRT, r.OP_ZDO_START);
+                            sendThis(ZDO_STRT, responseProcessor.OP_ZDO_START);
                             Thread.sleep(1000);
                             GiveResponse("Done...", Color.blue);
                             try {
@@ -1041,32 +1028,32 @@ public class ZigBeeToolView extends FrameView {
                             }
                         } else if (rBtnEndDevice.isSelected()) {
                             lblStatus("Resetting device...", Color.blue, 0);
-                            sendThis(SYST_RST, r.OP_RESET);
+                            sendThis(SYST_RST, responseProcessor.OP_RESET);
                             Thread.sleep(1000);
                             lblStatus("Writing Config...", Color.blue, 0);
-                            sendThis(WRT_CONFG, r.OP_WR_CFG);              // need to confirm the op command
+                            sendThis(WRT_CONFG, responseProcessor.OP_WR_CFG);              // need to confirm the op command
                             Thread.sleep(1000);
                             lblStatus("Resetting device...", Color.blue, 0);
 
-                            sendThis(SYST_RST, r.OP_RESET);
+                            sendThis(SYST_RST, responseProcessor.OP_RESET);
                             Thread.sleep(1000);
                             lblStatus("Log Coordinates...", Color.blue, 0);
-                            sendThis(LOG_END_DEVICE, r.OP_WR_LOG_TYPE);
+                            sendThis(LOG_END_DEVICE, responseProcessor.OP_WR_LOG_TYPE);
                             Thread.sleep(1000);
                             lblStatus("Setting Extended PAN IDs...", Color.blue, 0);
-                            sendThis(EPID, r.OP_WR_EPAN_ID);
+                            sendThis(EPID, responseProcessor.OP_WR_EPAN_ID);
                             Thread.sleep(1000);
                             lblStatus("Setting PAN IDs...", Color.blue, 0);
 
-                            sendThis(PANID, r.OP_WR_PAN_ID);
+                            sendThis(PANID, responseProcessor.OP_WR_PAN_ID);
                             Thread.sleep(1000);
                             lblStatus("Setting AF Registers...", Color.blue, 0);
 
-                            sendThis(AF_reg, r.OP_AF_REG);
+                            sendThis(AF_reg, responseProcessor.OP_AF_REG);
                             Thread.sleep(1000);
                             lblStatus("Finalizing Configuration...", Color.blue, 0);
 
-                            sendThis(ZDO_STRT, r.OP_ZDO_START);
+                            sendThis(ZDO_STRT, responseProcessor.OP_ZDO_START);
                             Thread.sleep(1000);
                             GiveResponse("Done...", Color.blue);
                             try {
@@ -1219,8 +1206,10 @@ public class ZigBeeToolView extends FrameView {
             }
             byte[] output = datatxnTxtArea.getText().getBytes();
             try {
-                report.write(output);
-                report.close();
+                if(report!=null) {
+                    report.write(output);
+                    report.close();
+                }
             } catch (IOException ex) {
                 Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -1393,35 +1382,35 @@ public class ZigBeeToolView extends FrameView {
             public void run() {
                 progressBar.setIndeterminate(true);
                 String[] serialPorts = serialHelper.getSerialPorts();
-
-                if (serialPorts.length == 0) {
-
-                    lblStatus.setText("No Communication port available. Please connect one and restart application.");
-                    lblStatus.setForeground(Color.red);
-                    connectBtn.setEnabled(false);
-                } else {
-                    connectBtn.setEnabled(true);
-                }
-
-                cmbComSelector.removeAllItems();
-                // cmbComSelector.addItem("Select COM Port");
                 if (serialPorts != null) {
-                    for (int i = 0; i < serialPorts.length; i++) {
-                        cmbComSelector.addItem(serialPorts[i]);
+
+                    if (serialPorts.length == 0) {
+
+                        lblStatus.setText("No Communication port available. Please connect one and restart application.");
+                        lblStatus.setForeground(Color.red);
+                        connectBtn.setEnabled(false);
+                    } else {
+                        connectBtn.setEnabled(true);
                     }
 
+                    cmbComSelector.removeAllItems();
+                    // cmbComSelector.addItem("Select COM Port");
+                    for (String serialPort : serialPorts) {
+                        cmbComSelector.addItem(serialPort);
+                    }
+
+
+                    ZigBeeToolApp.getApplication().view.getFrame().repaint();
+
+                    if (serialPorts.length == 1) {
+                        lblStatus.setText("Only 1 Com port available - " + serialPorts[0]);
+                        connectBtn.doClick();
+                    } else {
+                        lblStatus.setText("Available Com Ports : " + serialPorts.length);
+                    }
                 } else {
                     EnableDisableCalButtons(false);
                     lblStatus.setText("No serial ports available");
-                }
-
-                ZigBeeToolApp.getApplication().view.getFrame().repaint();
-
-                if (serialPorts.length == 1) {
-                    lblStatus.setText("Only 1 Com port avialable - " + serialPorts[0]);
-                    connectBtn.doClick();
-                } else {
-                    lblStatus.setText("Avaialble Com Ports : " + serialPorts.length);
                 }
 
                 progressBar.setIndeterminate(false);
@@ -1479,7 +1468,7 @@ public class ZigBeeToolView extends FrameView {
         te.start();
     }
 
-    private final static String getDateTime() {
+    private static String getDateTime() {
 
         DateFormat df = new SimpleDateFormat("HH:mm:ss -");
         // df.setTimeZone(TimeZone.getgetTimeZone("PST"));
@@ -1535,18 +1524,10 @@ public class ZigBeeToolView extends FrameView {
                             System.arraycopy(serialHelper.buffer, 0, p, 0, p.length);
 
                             SerialHelper.getSerialInputStream().read(p);
-                            responseProcessor rp = new responseProcessor();
-                            resp = new responseStruct();
 
-                            resp.startByte = p[0];
-                            resp.cmdLength = p[1];
-                            resp.cmd0 = p[2];
-                            resp.cmd1 = p[3];
-                            resp.dataBuffer = new byte[resp.cmdLength];
-                            System.arraycopy(p, 4, resp.dataBuffer, 0, resp.cmdLength);
-                            resp.checksum = p[p.length - 1];
+                            resp = new responseStruct(p);
 
-                            if (rp.processData(com, resp) == 1) {
+                            if (resp.isValid && responseProcessor.processData(com, resp) == 1) {
                                 ret = true;
                             }
 
@@ -1626,39 +1607,32 @@ public class ZigBeeToolView extends FrameView {
     }
 
     public String sendCmd(byte[] command, int com) {
-        boolean ret = false;
         int failed = 0;
         String t = "";
         currentSending = command;
         try {
             EnableDisableCalButtons(false);
             OutputStream os = SerialHelper.getSerialOutputStream();
-            InputStream is = serialHelper.getSerialInputStream();
+            
             while (failed < 100) {
                 try {
 
-                    os.flush();// is.reset();
                     os.write(currentSending);
+                    os.flush();// is.reset();
                 } catch (IOException ex) {
+                    Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.WARNING, null, ex);
                 }
                 Thread.sleep(400);
                 try {
-                    is = SerialHelper.getSerialInputStream();
+                    InputStream is = SerialHelper.getSerialInputStream();
                     int y = is.available();
                     if (y != 0) {
                         byte[] p = new byte[y];
                         is.read(p);
-                        responseProcessor rp = new responseProcessor();
-                        resp = new responseStruct();
-                        resp.startByte = p[0];
-                        resp.cmdLength = p[1];
-                        resp.cmd0 = p[2];
-                        resp.cmd1 = p[3];
-                        resp.dataBuffer = new byte[resp.cmdLength];
-                        System.arraycopy(p, 4, resp.dataBuffer, 0, resp.cmdLength);
-                        resp.checksum = p[p.length - 1];
-                        if (rp.processData(com, resp) == 1) {
-                            ret = true;
+                        resp = new responseStruct(p);
+
+                        if (resp.isValid) {
+                            int result= responseProcessor.processData(com, resp);
                         }
                         String hd = "";//new String(p);
                         for (int v = 0; v < p.length; v++) {
@@ -1691,9 +1665,11 @@ public class ZigBeeToolView extends FrameView {
             progressBar.setIndeterminate(false);
             EnableDisableCalButtons(true);
 
-        } catch (Exception chksum) {
+        } catch (InterruptedException chksum) {
             //   lblChecksumValue.setText(" N/A");
 
+        } catch (NumberFormatException chksum) {
+            //   lblChecksumValue.setText(" N/A");
         }
 
 //                 }});

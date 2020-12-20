@@ -197,9 +197,8 @@ public class communicationFrame extends javax.swing.JFrame {
        // cmbComSelector.addItem("Select COM Port");
         if (serialPorts != null)
         {
-                for (int i = 0; i < serialPorts.length; i++)
-                {
-                    jComboBox1.addItem(serialPorts[i]);
+                for (String serialPort : serialPorts) {
+                    jComboBox1.addItem(serialPort);
                 }
 
         }
