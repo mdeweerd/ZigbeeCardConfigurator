@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Enumeration;
+import java.util.TooManyListenersException;
 
 public class SerialHelper implements Runnable , SerialPortEventListener {
 
@@ -24,7 +25,6 @@ public class SerialHelper implements Runnable , SerialPortEventListener {
     final static int SPACE_ASCII = 32;
     final static int DASH_ASCII = 45;
     final static int NEW_LINE_ASCII = 10;
-    private boolean packet_start=false;
     Thread            readThread;
     public boolean data_available=false;
     public int len=0;
@@ -33,7 +33,7 @@ public class SerialHelper implements Runnable , SerialPortEventListener {
     public String[] getSerialPorts() {
         Enumeration ports = CommPortIdentifier.getPortIdentifiers();
         ArrayList portList = new ArrayList();
-        String portArray[] = null;
+        String portArray[];
         while (ports.hasMoreElements()) {
             CommPortIdentifier port = (CommPortIdentifier) ports.nextElement();
             if (port.getPortType() == CommPortIdentifier.PORT_SERIAL) {
@@ -67,8 +67,8 @@ public class SerialHelper implements Runnable , SerialPortEventListener {
             try {
                 serialPort.addEventListener(this);
 
-            } catch (Exception ex) {
-                System.err.println("Excpetion caught:");
+            } catch (TooManyListenersException ex) {
+                System.err.println("Exception caught:");
             }
 
             serialPort.notifyOnDataAvailable(true);
@@ -95,6 +95,7 @@ public class SerialHelper implements Runnable , SerialPortEventListener {
         return inStream;
     }
 
+    @SuppressWarnings("empty-statement")
     public static OutputStream getSerialOutputStream() {
         while(outStream==null);
         return outStream;
@@ -145,7 +146,7 @@ public class SerialHelper implements Runnable , SerialPortEventListener {
      {
          outStream.write(data);
      }
-     catch(Exception ex)
+     catch(IOException ex)
      {
          System.err.println("Exception in writedata");
      }
@@ -157,7 +158,7 @@ public class SerialHelper implements Runnable , SerialPortEventListener {
          outStream.write(data);
          outStream.flush();
      }
-     catch(Exception ex)
+     catch(IOException ex)
      {
          System.err.println("Exception in writedata");
      }
@@ -172,7 +173,7 @@ public class SerialHelper implements Runnable , SerialPortEventListener {
           data= inStream.read();
           ret =(byte)data;
           }
-          catch(Exception ex)
+          catch(IOException ex)
           {
 
           }
@@ -184,6 +185,7 @@ public class SerialHelper implements Runnable , SerialPortEventListener {
     //what happens when data is received
     //pre: serial event is triggered
     //post: processing on the data it reads
+    @SuppressWarnings("CallToPrintStackTrace")
     public void serialEvent(SerialPortEvent evt) {
         byte[] dataBuf = new byte[9];
         int data;

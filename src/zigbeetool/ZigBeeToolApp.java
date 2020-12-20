@@ -6,16 +6,27 @@ package zigbeetool;
 
 import org.jdesktop.application.Application;
 import org.jdesktop.application.SingleFrameApplication;
+import com.bulenkov.darcula.DarculaLaf;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.*;
+
 
 /**
  * The main class of the application.
  */
 public class ZigBeeToolApp extends SingleFrameApplication {
-ZigBeeToolView view=null;
+    ZigBeeToolView view=null;
     /**
      * At startup create and show the main frame of the application.
      */
     @Override protected void startup() {
+    try {
+        UIManager.setLookAndFeel(new DarculaLaf());
+	//SwingUtilities.updateComponentTreeUI(view.getComponent());
+    } catch (UnsupportedLookAndFeelException ex) {
+        Logger.getLogger(ZigBeeToolApp.class.getName()).log(Level.SEVERE, null, ex);
+    }
         view = new ZigBeeToolView(this);
         show(view);
     }

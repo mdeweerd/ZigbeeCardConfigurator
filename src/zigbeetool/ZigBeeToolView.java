@@ -1,7 +1,6 @@
 /*
  * ZigBeeToolView.java
  */
-
 package zigbeetool;
 
 import java.awt.Color;
@@ -48,35 +47,32 @@ import javax.swing.text.StyleConstants;
  * The application's main frame.
  */
 public class ZigBeeToolView extends FrameView {
-    private SerialHelper serialHelper = new SerialHelper();
+
+    private final SerialHelper serialHelper = new SerialHelper();
     public int heighty;
     public Thread checksum;
     public responseStruct resp;
     public ResourceMap resourceMap;
-    private SharedData sharedData = SharedData.getSingletonObject();
+    //private SharedData sharedData = SharedData.getSingletonObject();
 
-
-byte[] SYST_RST = {(byte)0xfe,0x01,0x41,0x00,0x00,0x40};
-byte[] WRT_CONFG = {(byte)0xfe,0x03,0x26,0x05,0x03,0x01,0x03,0x21};
-byte[] ZDO_STRT = {(byte) 0xfe,0x02,0x25,0x40,0x00,0x00,0x67};	//7
-byte[] AF_reg = {(byte)0xfe,0x11,0x24,0x00,0x01,0x09,0x01,0x01,0x05,0x01,0x00,0x02,0x02,0x07,0x12,0x34,0x15,0x00,0x01,0x00,0x00,0x0C}; //22
-byte[] ROUTER={(byte)0xFE, 0x03, 0x26, 0x05, (byte)0x87, 0x01, 0x01, (byte)0xA7};
-byte[] LOG_CORD = {(byte)0xfe,0x03,0x26,0x05,(byte)0x87,0x01,0x00,(byte)0xa6};
-byte[] EPID = {(byte) 0xfe,0x0a,0x26,0x05,0x2d,0x08,0x00,0x00,0x00,0x10,0x77,(byte)0xc2,0x50,0x00,(byte)0xf9};
-byte[] PANID = {(byte)0xfe,0x04,0x26,0x05,(byte)0x83,0x02,0x12,0x34,(byte)0x80};
-byte[] IEEE_ADDRS = {(byte) 0xfe, 0x01, 0x26, 0x06, 0x01, 0x20};
-byte[] AF_Data = {(byte)0xfe,0x0d,0x24,0x01,(byte)0xff,(byte)0xff,0x01,0x01,0x02,0x07,0x00,0x00,0x00,0x03,0x0,0x0,0x0,0x2E};//16
-byte[] AF_REG_Router = {(byte)0xFE, 0x11, 0x24, 0x00 ,0x01, 0x09, 0x01, 0x01,0x05 ,0x01 ,0x00,0x00, 0x04 ,0x0 ,0x0 ,0x15 ,0x0 ,0x12, 0x34,0x2,0x7,0x0b};
+    byte[] SYST_RST = {(byte) 0xfe, 0x01, 0x41, 0x00, 0x00, 0x40};
+    byte[] WRT_CONFG = {(byte) 0xfe, 0x03, 0x26, 0x05, 0x03, 0x01, 0x03, 0x21};
+    byte[] ZDO_STRT = {(byte) 0xfe, 0x02, 0x25, 0x40, 0x00, 0x00, 0x67};	//7
+    byte[] AF_reg = {(byte) 0xfe, 0x11, 0x24, 0x00, 0x01, 0x09, 0x01, 0x01, 0x05, 0x01, 0x00, 0x02, 0x02, 0x07, 0x12, 0x34, 0x15, 0x00, 0x01, 0x00, 0x00, 0x0C}; //22
+    byte[] ROUTER = {(byte) 0xFE, 0x03, 0x26, 0x05, (byte) 0x87, 0x01, 0x01, (byte) 0xA7};
+    byte[] LOG_CORD = {(byte) 0xfe, 0x03, 0x26, 0x05, (byte) 0x87, 0x01, 0x00, (byte) 0xa6};
+    byte[] EPID = {(byte) 0xfe, 0x0a, 0x26, 0x05, 0x2d, 0x08, 0x00, 0x00, 0x00, 0x10, 0x77, (byte) 0xc2, 0x50, 0x00, (byte) 0xf9};
+    byte[] PANID = {(byte) 0xfe, 0x04, 0x26, 0x05, (byte) 0x83, 0x02, 0x12, 0x34, (byte) 0x80};
+    byte[] IEEE_ADDRS = {(byte) 0xfe, 0x01, 0x26, 0x06, 0x01, 0x20};
+    byte[] AF_Data = {(byte) 0xfe, 0x0d, 0x24, 0x01, (byte) 0xff, (byte) 0xff, 0x01, 0x01, 0x02, 0x07, 0x00, 0x00, 0x00, 0x03, 0x0, 0x0, 0x0, 0x2E};//16
+    byte[] AF_REG_Router = {(byte) 0xFE, 0x11, 0x24, 0x00, 0x01, 0x09, 0x01, 0x01, 0x05, 0x01, 0x00, 0x00, 0x04, 0x0, 0x0, 0x15, 0x0, 0x12, 0x34, 0x2, 0x7, 0x0b};
 //byte[] AF_reg = {(byte)0xFE, 0xD, 0x24, 0x00 ,0x01, 0x09, 0x01, 0x01,0x05 ,0x01 ,0x00,0x00, 0x02 ,0x07 ,0x00 ,0x04 ,0x0 ,0xD};
 //byte[] AF_REG_Router = {(byte)0xFE, 0xD, 0x24, 0x00 ,0x01, 0x09, 0x01, 0x01,0x05 ,0x01 ,0x00,0x00, 0x04 ,0x00 ,0x00 ,0x02 ,0x07 ,0xD};
-byte[] LOG_END_DEVICE={(byte) 0xFE, 0x03, 0x26, 0x05, (byte)0x87, 0x01, 0x02, (byte)0xA4};
-byte[] currentSending;
-Document doc;
-SimpleAttributeSet Tx;
-SimpleAttributeSet Rx;
-
-
-
+    byte[] LOG_END_DEVICE = {(byte) 0xFE, 0x03, 0x26, 0x05, (byte) 0x87, 0x01, 0x02, (byte) 0xA4};
+    byte[] currentSending;
+    Document doc;
+    SimpleAttributeSet Tx;
+    SimpleAttributeSet Rx;
 
     public ZigBeeToolView(SingleFrameApplication app) {
         super(app);
@@ -85,26 +81,24 @@ SimpleAttributeSet Rx;
         initialGUISettings();
         datatxnTxtArea.setEditable(false);
 
+        doc = datatxnTxtArea.getDocument();
 
-              doc = datatxnTxtArea.getDocument();
-       
         Tx = new SimpleAttributeSet();
-            StyleConstants.setForeground(Tx, Color.BLUE);
-           // StyleConstants.setBackground(Tx, Color.YELLOW);
-           // StyleConstants.setBold(Tx, true);
-          
-             Rx = new SimpleAttributeSet();
-            StyleConstants.setForeground(Rx, Color.RED);
+        StyleConstants.setForeground(Tx, Color.BLUE);
+        // StyleConstants.setBackground(Tx, Color.YELLOW);
+        // StyleConstants.setBold(Tx, true);
+
+        Rx = new SimpleAttributeSet();
+        StyleConstants.setForeground(Rx, Color.RED);
 //            StyleConstants.setBackground(Rx, Color.YELLOW);
 //            StyleConstants.setBold(Rx, true);
 
-      
         // status bar initialization - message timeout, idle icon and busy animation, etc
         ResourceMap resourceMap = getResourceMap();
         int messageTimeout = resourceMap.getInteger("StatusBar.messageTimeout");
         messageTimer = new Timer(messageTimeout, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-              //  statusMessageLabel.setText("");
+                //  statusMessageLabel.setText("");
             }
         });
         messageTimer.setRepeats(false);
@@ -115,12 +109,12 @@ SimpleAttributeSet Rx;
         busyIconTimer = new Timer(busyAnimationRate, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 busyIconIndex = (busyIconIndex + 1) % busyIcons.length;
-               // statusAnimationLabel.setIcon(busyIcons[busyIconIndex]);
+                // statusAnimationLabel.setIcon(busyIcons[busyIconIndex]);
             }
         });
         idleIcon = resourceMap.getIcon("StatusBar.idleIcon");
-       // statusAnimationLabel.setIcon(idleIcon);
-      //  progressBar.setVisible(false);
+        // statusAnimationLabel.setIcon(idleIcon);
+        //  progressBar.setVisible(false);
 
         // connecting action tasks to status bar via TaskMonitor
         TaskMonitor taskMonitor = new TaskMonitor(getApplication().getContext());
@@ -129,7 +123,7 @@ SimpleAttributeSet Rx;
                 String propertyName = evt.getPropertyName();
                 if ("started".equals(propertyName)) {
                     if (!busyIconTimer.isRunning()) {
-                   //     statusAnimationLabel.setIcon(busyIcons[0]);
+                        //     statusAnimationLabel.setIcon(busyIcons[0]);
                         busyIconIndex = 0;
                         busyIconTimer.start();
                     }
@@ -137,15 +131,15 @@ SimpleAttributeSet Rx;
                     progressBar.setIndeterminate(true);
                 } else if ("done".equals(propertyName)) {
                     busyIconTimer.stop();
-                   // statusAnimationLabel.setIcon(idleIcon);
+                    // statusAnimationLabel.setIcon(idleIcon);
                     progressBar.setVisible(false);
                     progressBar.setValue(0);
                 } else if ("message".equals(propertyName)) {
-                    String text = (String)(evt.getNewValue());
-                   // statusMessageLabel.setText((text == null) ? "" : text);
+                    String text = (String) (evt.getNewValue());
+                    // statusMessageLabel.setText((text == null) ? "" : text);
                     messageTimer.restart();
                 } else if ("progress".equals(propertyName)) {
-                    int value = (Integer)(evt.getNewValue());
+                    int value = (Integer) (evt.getNewValue());
                     progressBar.setVisible(true);
                     progressBar.setIndeterminate(false);
                     progressBar.setValue(value);
@@ -164,10 +158,10 @@ SimpleAttributeSet Rx;
         ZigBeeToolApp.getApplication().show(aboutBox);
     }
 
-    /** This method is called from within the constructor to
-     * initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is
-     * always regenerated by the Form Editor.
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -741,45 +735,46 @@ SimpleAttributeSet Rx;
 
     private void cmdTxtFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdTxtFieldActionPerformed
 
-      //  cmdTxtField.setText("");
+        //  cmdTxtField.setText("");
 }//GEN-LAST:event_cmdTxtFieldActionPerformed
 
     private void connectBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_connectBtnActionPerformed
         // TODO add your handling code here:
-        if(connectBtn.getText().contentEquals("Connect")){
-        boolean connect=false;
+        if (connectBtn.getText().contentEquals("Connect")) {
+            boolean connect = false;
             try {
-                connect = serialHelper.connect((String) cmbComSelector.getSelectedItem(),9600);
+                connect = serialHelper.connect((String) cmbComSelector.getSelectedItem(), 9600);
             } catch (IOException ex) {
                 Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.SEVERE, null, ex);
             }
-            if(connect){
+            if (connect) {
                 connectBtn.setText("Disconnect");
                 connectBtn.setIcon(resourceMap.getIcon("disconnect.icon"));
                 EnableDisableCalButtons(true);
                 final responseProcessor r = new responseProcessor();
-              
-           if(sendThis(IEEE_ADDRS, r.OP_IEEE_ADDRS))
-                {
+
+                if (sendThis(IEEE_ADDRS, r.OP_IEEE_ADDRS)) {
                     byte[] desc = new byte[resp.dataBuffer.length];
-                    desc= resp.dataBuffer;
+                    desc = resp.dataBuffer;
                     String p = "";
                     String q = "";
-            for(int b=1;b<desc.length;b++){
-                q = Byte.toString(desc[b]);
-                q = Long.toHexString(Long.parseLong(q));
-                if(q.length()>2) q=  q.substring(q.length()-2, q.length());
-                if(q.length()==1) q="0".concat(q);
-                p=p.concat(q+ " ");
-            }
-                   lblStatus.setText("Connected device (IEEE Address) - "+ p.toUpperCase() );
-                   lblStatus.setForeground(Color.BLUE);
+                    for (int b = 1; b < desc.length; b++) {
+                        q = Byte.toString(desc[b]);
+                        q = Long.toHexString(Long.parseLong(q));
+                        if (q.length() > 2) {
+                            q = q.substring(q.length() - 2, q.length());
+                        }
+                        if (q.length() == 1) {
+                            q = "0".concat(q);
+                        }
+                        p = p.concat(q + " ");
+                    }
+                    lblStatus.setText("Connected device (IEEE Address) - " + p.toUpperCase());
+                    lblStatus.setForeground(Color.BLUE);
                 }
 
-            }}
-
-
-        else{
+            }
+        } else {
             //    startTread(false);
             serialHelper.disconnect();
             //           comPortListener.yield();
@@ -788,106 +783,107 @@ SimpleAttributeSet Rx;
             EnableDisableCalButtons(false);
 
         }
-       
-            
+
+
 }//GEN-LAST:event_connectBtnActionPerformed
 
     private void sendBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sendBtnActionPerformed
 
-       if(cmdTxtField.getText().contains("")) {
-            JOptionPane.showMessageDialog(this.getFrame(),"Please provide the command. \nFor eg: FE0141000040 is for reset", "Error", JOptionPane.ERROR_MESSAGE);
-        }
- else{
-         checksum = new Thread(new Runnable() {
-        public void run  ()
-        {
-                int failed = 0;
-       //  memviewMode();
+        if (cmdTxtField.getText().contains("")) {
+            JOptionPane.showMessageDialog(this.getFrame(), "Please provide the command. \nFor eg: FE0141000040 is for reset", "Error", JOptionPane.ERROR_MESSAGE);
+        } else {
+            checksum = new Thread(new Runnable() {
+                public void run() {
+                    int failed = 0;
+                    //  memviewMode();
 
-         try{
- progressBar.setIndeterminate(true);
-        EnableDisableCalButtons(false);
+                    try {
+                        progressBar.setIndeterminate(true);
+                        EnableDisableCalButtons(false);
 
- byte[] sendBytes = new byte[cmdTxtField.getText().length()/2];
+                        byte[] sendBytes = new byte[cmdTxtField.getText().length() / 2];
 
-        long h= Long.parseLong(cmdTxtField.getText(),16);
-        for(int y=cmdTxtField.getText().length()/2;y>0;y--){
-            sendBytes[y-1]=(byte) (h & 0xff);
-            h=h>>8;
-        }
-        OutputStream os = serialHelper.getSerialOutputStream();
-        InputStream is = serialHelper.getSerialInputStream();
-        //            if(is.markSupported()){
-        //                is.mark(0);
-        //            }
-
-        while(failed<100){
-            try {
-                
-                os.flush();// is.reset();
-                os.write(sendBytes);
-            } catch (IOException ex) {
-             //   Logger.getLogger(EnergyMeterFrame.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            Thread.sleep(200);
-            try {
-                int y =is.available();
-                if ( y!= 0) {
-                    {
-                        byte[] p = new byte[y];
-                        is.read(p);
-                        String hd ="";//new String(p);
-                        for(int v =0;v<p.length;v++){
-                            String kl = Byte.toString(p[v]);
-                            String m = Long.toHexString(Long.parseLong(kl));
-                            if(m.length()>2){
-                                m=m.substring(m.length()-2);
-                            }
-                            hd=hd.concat(" "+ m);
+                        long h = Long.parseLong(cmdTxtField.getText(), 16);
+                        for (int y = cmdTxtField.getText().length() / 2; y > 0; y--) {
+                            sendBytes[y - 1] = (byte) (h & 0xff);
+                            h = h >> 8;
                         }
-                        //  logData += " : 0x" + Integer.toHexString(uartRxHandler.currentData[uartRxHandler.bytesToProcess  + i]).toUpperCase() + " ";
-                        String t = hd.toUpperCase();
-                        //                        if(t.length()>2){
-                        //                            t=t.substring(t.length()-2);
-                        //                        }
-                        //                        System.out.println(t);
-                      if(timeStampChkBx.isSelected()){
-                           doc.insertString( doc.getLength(),getDateTime(),null);
-                       }
-                        doc.insertString(doc.getLength(), t, null);
-                       // ZigBeeToolView.datatxnTxtArea.setText(  ZigBeeToolView.datatxnTxtArea.getText().concat(t));
-                    }
-                     doc.insertString(doc.getLength(),System.getProperty("line.separator"), null);
-   datatxnTxtArea.setCaretPosition(datatxnTxtArea.getDocument().getLength());
+                        OutputStream os = SerialHelper.getSerialOutputStream();
+                        InputStream is = SerialHelper.getSerialInputStream();
+                        //            if(is.markSupported()){
+                        //                is.mark(0);
+                        //            }
+
+                        while (failed < 100) {
+                            try {
+
+                                os.flush();// is.reset();
+                                os.write(sendBytes);
+                            } catch (IOException ex) {
+                                //   Logger.getLogger(EnergyMeterFrame.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                            Thread.sleep(200);
+                            try {
+                                int y = is.available();
+                                if (y != 0) {
+                                    {
+                                        byte[] p = new byte[y];
+                                        is.read(p);
+                                        String hd = "";//new String(p);
+                                        for (int v = 0; v < p.length; v++) {
+                                            String kl = Byte.toString(p[v]);
+                                            String m = Long.toHexString(Long.parseLong(kl));
+                                            if (m.length() > 2) {
+                                                m = m.substring(m.length() - 2);
+                                            }
+                                            hd = hd.concat(" " + m);
+                                        }
+                                        //  logData += " : 0x" + Integer.toHexString(uartRxHandler.currentData[uartRxHandler.bytesToProcess  + i]).toUpperCase() + " ";
+                                        String t = hd.toUpperCase();
+                                        //                        if(t.length()>2){
+                                        //                            t=t.substring(t.length()-2);
+                                        //                        }
+                                        //                        System.out.println(t);
+                                        if (timeStampChkBx.isSelected()) {
+                                            doc.insertString(doc.getLength(), getDateTime(), null);
+                                        }
+                                        doc.insertString(doc.getLength(), t, null);
+                                        // ZigBeeToolView.datatxnTxtArea.setText(  ZigBeeToolView.datatxnTxtArea.getText().concat(t));
+                                    }
+                                    doc.insertString(doc.getLength(), System.getProperty("line.separator"), null);
+                                    datatxnTxtArea.setCaretPosition(datatxnTxtArea.getDocument().getLength());
 //
-                    //  is.reset();
-                    break;
+                                    //  is.reset();
+                                    break;
+                                }
+                                // serialHelper.disconnect();
+                                failed++;
+                                //   firmwareHandler.WriteRequest(sendBytes);
+                            } catch (IOException ex) {
+                                Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                        if (failed == 100) {
+                            GiveResponse("Attempted 100 times, but failed", Color.RED);
+                            checksum.yield();
+
+                        } else {
+
+                        }
+                        progressBar.setIndeterminate(false);
+                        EnableDisableCalButtons(true);
+
+                    } catch (InterruptedException chksum) {
+                        //   lblChecksumValue.setText(" N/A");
+
+                    } catch (NumberFormatException chksum) {
+                        //   lblChecksumValue.setText(" N/A");
+                    } catch (BadLocationException chksum) {
+                    }
+
                 }
-               // serialHelper.disconnect();
-                failed++;
-                //   firmwareHandler.WriteRequest(sendBytes);
-            } catch (IOException ex) {
-                Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        if(failed==100){
-           GiveResponse("Attempted 100 times, but failed", Color.RED);
-           checksum.yield();
-
-        }
- else {
-           
- }
-        progressBar.setIndeterminate(false);
-        EnableDisableCalButtons(true);
-
-                }catch(Exception chksum){
-              //   lblChecksumValue.setText(" N/A");
-
-                }
-
-                 }});
-                 checksum.start();
+            });
+            checksum.start();
         }
         //   firmwareHandler.WriteRequest(sendBytes);
     }//GEN-LAST:event_sendBtnActionPerformed
@@ -902,14 +898,14 @@ SimpleAttributeSet Rx;
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
-    RequestPW rpw = new RequestPW(null, true);
-            rpw.setLocationRelativeTo(this.getFrame());
-           // Image icon2 = Toolkit.getDefaultToolkit().getImage(ProdProgrammerView.class.getResource("resources/login_icon.gif"));
-              rpw.setVisible(true);
+        RequestPW rpw = new RequestPW(null, true);
+        rpw.setLocationRelativeTo(this.getFrame());
+        // Image icon2 = Toolkit.getDefaultToolkit().getImage(ProdProgrammerView.class.getResource("resources/login_icon.gif"));
+        rpw.setVisible(true);
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     private void connectBtnItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_connectBtnItemStateChanged
-    //  EnableDisableCalButtons(false);
+        //  EnableDisableCalButtons(false);
     }//GEN-LAST:event_connectBtnItemStateChanged
 
     private void cmdTxtFieldFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_cmdTxtFieldFocusGained
@@ -917,264 +913,257 @@ SimpleAttributeSet Rx;
     }//GEN-LAST:event_cmdTxtFieldFocusGained
 
     private void btnConfigureDeviceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfigureDeviceActionPerformed
-    final responseProcessor r = new responseProcessor();
-  //   boolean sent=false;
-        if(panIDtxtField.getText().length() !=4 && panIDtxtField.getText().length()!=0){
-   new JOptionPane().showMessageDialog(this.getFrame(), "Please provide 2 bytes for PAN ID \n","Error",  JOptionPane.ERROR_MESSAGE);
+        final responseProcessor r = new responseProcessor();
+        //   boolean sent=false;
+        if (panIDtxtField.getText().length() != 4 && panIDtxtField.getText().length() != 0) {
+            JOptionPane.showMessageDialog(this.getFrame(), "Please provide 2 bytes for PAN ID \n", "Error", JOptionPane.ERROR_MESSAGE);
 
-}
- else{
-        Thread dhum = new Thread(new Runnable() {
-        public void run  ()
-        {
-            Thread dhum1=null;
-            
+        } else {
+            Thread dhum = new Thread(new Runnable() {
+                public void run() {
+                    Thread dhum1;
 
 //        OutputStream os = serialHelper.getSerialOutputStream();
-        try {
-            String hj = panIDtxtField.getText();
-           if(hj.length()!=0){
-               int dummy;
-                           
-              dummy = Integer.parseInt(panIDtxtField.getText(),16);
-                          
-              PANID[6]=(byte)((dummy & 0xFF00) >> 8);
+                    try {
+                        String hj = panIDtxtField.getText();
+                        if (hj.length() != 0) {
+                            int dummy;
 
-            PANID[7]=(byte)(dummy & 0xFF); //9844172044
-           // PANID[8] = checksumCalculator(PANID);
-            }
-if(rBtnCoOrd.isSelected()){
-            boolean sent=false;
-            lblStatus("Resetting device...",Color.blue,0);
-            sendThis(SYST_RST , r.OP_RESET);
-            Thread.sleep(1000);
-            
-            //if(sent)
-            {
-                lblStatus("Writing Config...",Color.blue,0);
-                sent=sendThis(WRT_CONFG,r.OP_WR_CFG );
-                Thread.sleep(1000);
-            }
-            
-          //  if(sent)
-            {
-            lblStatus("Resetting device...",Color.blue,0);
+                            dummy = Integer.parseInt(panIDtxtField.getText(), 16);
 
-            sent=sendThis(SYST_RST , r.OP_RESET);
-            Thread.sleep(1000);
-    }
+                            PANID[6] = (byte) ((dummy & 0xFF00) >> 8);
 
-            //if(sent)
-            {
-            lblStatus("Log Coordinates...",Color.blue,0);
-            sendThis(LOG_CORD, r.OP_WR_LOG_TYPE);
-            Thread.sleep(1000);
-    }
-           // if(sent)
-            {
-            lblStatus("Setting Extended PAN IDs...",Color.blue,0);
-            sent=sendThis(EPID , r.OP_WR_EPAN_ID);
-            Thread.sleep(1000);
-    }
-           //if(sent)
-           {
-            lblStatus("Setting PAN IDs...",Color.blue,0);
+                            PANID[7] = (byte) (dummy & 0xFF); //9844172044
+                            // PANID[8] = checksumCalculator(PANID);
+                        }
+                        if (rBtnCoOrd.isSelected()) {
+                            boolean sent = false;
+                            lblStatus("Resetting device...", Color.blue, 0);
+                            sendThis(SYST_RST, r.OP_RESET);
+                            Thread.sleep(1000);
 
-            sent=sendThis(PANID , r.OP_WR_PAN_ID);
-            Thread.sleep(1000);
-    }
-            //if(sent)
-            {
-            lblStatus("Setting AF Registers...",Color.blue,0);
+                            //if(sent)
+                            {
+                                lblStatus("Writing Config...", Color.blue, 0);
+                                sent = sendThis(WRT_CONFG, r.OP_WR_CFG);
+                                Thread.sleep(1000);
+                            }
 
-            sent=sendThis(AF_reg , r.OP_AF_REG);
-            Thread.sleep(1000);
-    }
-          // if(sent)
-           {
-            lblStatus("Finalizing Configuration...",Color.blue,0);
+                            //  if(sent)
+                            {
+                                lblStatus("Resetting device...", Color.blue, 0);
 
-            sent=sendThis(ZDO_STRT , r.OP_ZDO_START);
-             Thread.sleep(1000);
-    }
+                                sent = sendThis(SYST_RST, r.OP_RESET);
+                                Thread.sleep(1000);
+                            }
+
+                            //if(sent)
+                            {
+                                lblStatus("Log Coordinates...", Color.blue, 0);
+                                sendThis(LOG_CORD, r.OP_WR_LOG_TYPE);
+                                Thread.sleep(1000);
+                            }
+                            // if(sent)
+                            {
+                                lblStatus("Setting Extended PAN IDs...", Color.blue, 0);
+                                sent = sendThis(EPID, r.OP_WR_EPAN_ID);
+                                Thread.sleep(1000);
+                            }
+                            //if(sent)
+                            {
+                                lblStatus("Setting PAN IDs...", Color.blue, 0);
+
+                                sent = sendThis(PANID, r.OP_WR_PAN_ID);
+                                Thread.sleep(1000);
+                            }
+                            //if(sent)
+                            {
+                                lblStatus("Setting AF Registers...", Color.blue, 0);
+
+                                sent = sendThis(AF_reg, r.OP_AF_REG);
+                                Thread.sleep(1000);
+                            }
+                            // if(sent)
+                            {
+                                lblStatus("Finalizing Configuration...", Color.blue, 0);
+
+                                sent = sendThis(ZDO_STRT, r.OP_ZDO_START);
+                                Thread.sleep(1000);
+                            }
 
 //            if(sent){
-            GiveResponse("Done...", Color.blue);
-            try {
-                sound(2000, 500, 1.0);
-            } catch (IllegalArgumentException ex) {
-                Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (LineUnavailableException ex) {
-                Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.SEVERE, null, ex);
-            }
+                            GiveResponse("Done...", Color.blue);
+                            try {
+                                sound(2000, 500, 1.0);
+                            } catch (IllegalArgumentException ex) {
+                                Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.SEVERE, null, ex);
+                            } catch (LineUnavailableException ex) {
+                                Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.SEVERE, null, ex);
+                            }
 //            }
 //            else GiveResponse("Failed to Configure", Color.RED);
 
-            }
-            else if(rBtnRouter.isSelected()){
-            lblStatus("Resetting device...",Color.blue,0);
-            sendThis(SYST_RST, r.OP_RESET);
-            Thread.sleep(1000);
-            lblStatus("Writing Config...",Color.blue,0);
-            sendThis(WRT_CONFG , r.OP_WR_CFG);              // need to confirm the op command
-            Thread.sleep(1000);
-            lblStatus("Resetting device...",Color.blue,0);
+                        } else if (rBtnRouter.isSelected()) {
+                            lblStatus("Resetting device...", Color.blue, 0);
+                            sendThis(SYST_RST, r.OP_RESET);
+                            Thread.sleep(1000);
+                            lblStatus("Writing Config...", Color.blue, 0);
+                            sendThis(WRT_CONFG, r.OP_WR_CFG);              // need to confirm the op command
+                            Thread.sleep(1000);
+                            lblStatus("Resetting device...", Color.blue, 0);
 
-            sendThis(SYST_RST, r.OP_RESET);
-            Thread.sleep(1000);
-            lblStatus("Log Coordinates...",Color.blue,0);
-            sendThis(ROUTER, r.OP_WR_LOG_TYPE);
-            Thread.sleep(1000);
-            lblStatus("Setting Extended PAN IDs...",Color.blue,0);
-            sendThis(EPID , r.OP_WR_EPAN_ID);
-            Thread.sleep(1000);
-            lblStatus("Setting PAN IDs...",Color.blue,0);
+                            sendThis(SYST_RST, r.OP_RESET);
+                            Thread.sleep(1000);
+                            lblStatus("Log Coordinates...", Color.blue, 0);
+                            sendThis(ROUTER, r.OP_WR_LOG_TYPE);
+                            Thread.sleep(1000);
+                            lblStatus("Setting Extended PAN IDs...", Color.blue, 0);
+                            sendThis(EPID, r.OP_WR_EPAN_ID);
+                            Thread.sleep(1000);
+                            lblStatus("Setting PAN IDs...", Color.blue, 0);
 
-            sendThis(PANID , r.OP_WR_PAN_ID);
-            Thread.sleep(1000);
-            lblStatus("Setting AF Registers...",Color.blue,0);
+                            sendThis(PANID, r.OP_WR_PAN_ID);
+                            Thread.sleep(1000);
+                            lblStatus("Setting AF Registers...", Color.blue, 0);
 
-            sendThis(AF_REG_Router, r.OP_AF_REG);
-            Thread.sleep(1000);
-            lblStatus("Finalizing Configuration...",Color.blue,0);
-            sendThis(ZDO_STRT, r.OP_ZDO_START);
-            Thread.sleep(1000);
-            GiveResponse("Done...", Color.blue);
-            try {
-                sound(2000, 500, 1.0);
-            } catch (IllegalArgumentException ex) {
-                Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (LineUnavailableException ex) {
-                Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            }
+                            sendThis(AF_REG_Router, r.OP_AF_REG);
+                            Thread.sleep(1000);
+                            lblStatus("Finalizing Configuration...", Color.blue, 0);
+                            sendThis(ZDO_STRT, r.OP_ZDO_START);
+                            Thread.sleep(1000);
+                            GiveResponse("Done...", Color.blue);
+                            try {
+                                sound(2000, 500, 1.0);
+                            } catch (IllegalArgumentException ex) {
+                                Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.SEVERE, null, ex);
+                            } catch (LineUnavailableException ex) {
+                                Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        } else if (rBtnEndDevice.isSelected()) {
+                            lblStatus("Resetting device...", Color.blue, 0);
+                            sendThis(SYST_RST, r.OP_RESET);
+                            Thread.sleep(1000);
+                            lblStatus("Writing Config...", Color.blue, 0);
+                            sendThis(WRT_CONFG, r.OP_WR_CFG);              // need to confirm the op command
+                            Thread.sleep(1000);
+                            lblStatus("Resetting device...", Color.blue, 0);
 
-            else if(rBtnEndDevice.isSelected()){
-            lblStatus("Resetting device...",Color.blue,0);
-            sendThis(SYST_RST, r.OP_RESET);
-            Thread.sleep(1000);
-            lblStatus("Writing Config...",Color.blue,0);
-            sendThis(WRT_CONFG , r.OP_WR_CFG);              // need to confirm the op command
-            Thread.sleep(1000);
-            lblStatus("Resetting device...",Color.blue,0);
+                            sendThis(SYST_RST, r.OP_RESET);
+                            Thread.sleep(1000);
+                            lblStatus("Log Coordinates...", Color.blue, 0);
+                            sendThis(LOG_END_DEVICE, r.OP_WR_LOG_TYPE);
+                            Thread.sleep(1000);
+                            lblStatus("Setting Extended PAN IDs...", Color.blue, 0);
+                            sendThis(EPID, r.OP_WR_EPAN_ID);
+                            Thread.sleep(1000);
+                            lblStatus("Setting PAN IDs...", Color.blue, 0);
 
-            sendThis(SYST_RST, r.OP_RESET);
-            Thread.sleep(1000);
-            lblStatus("Log Coordinates...",Color.blue,0);
-            sendThis(LOG_END_DEVICE, r.OP_WR_LOG_TYPE);
-            Thread.sleep(1000);
-            lblStatus("Setting Extended PAN IDs...",Color.blue,0);
-            sendThis(EPID , r.OP_WR_EPAN_ID);
-            Thread.sleep(1000);
-            lblStatus("Setting PAN IDs...",Color.blue,0);
+                            sendThis(PANID, r.OP_WR_PAN_ID);
+                            Thread.sleep(1000);
+                            lblStatus("Setting AF Registers...", Color.blue, 0);
 
-            sendThis(PANID , r.OP_WR_PAN_ID);
-            Thread.sleep(1000);
-            lblStatus("Setting AF Registers...",Color.blue,0);
+                            sendThis(AF_reg, r.OP_AF_REG);
+                            Thread.sleep(1000);
+                            lblStatus("Finalizing Configuration...", Color.blue, 0);
 
-            sendThis(AF_reg, r.OP_AF_REG);
-            Thread.sleep(1000);
-            lblStatus("Finalizing Configuration...",Color.blue,0);
-
-            sendThis(ZDO_STRT, r.OP_ZDO_START);
-            Thread.sleep(1000);
-            GiveResponse("Done...", Color.blue);
-            try {
-                sound(2000, 500, 1.0);
-            } catch (IllegalArgumentException ex) {
-                Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (LineUnavailableException ex) {
-                Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            }
-                    try {
-                        dhum1 = new Thread(new Runnable() {
-        public void run  ()
-        {
-                    try {
+                            sendThis(ZDO_STRT, r.OP_ZDO_START);
+                            Thread.sleep(1000);
+                            GiveResponse("Done...", Color.blue);
+                            try {
+                                sound(2000, 500, 1.0);
+                            } catch (IllegalArgumentException ex) {
+                                Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.SEVERE, null, ex);
+                            } catch (LineUnavailableException ex) {
+                                Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
                         try {
-                                try {
-                                    KeepChecking();
-                                } catch (BadLocationException ex) {
-                                    Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.SEVERE, null, ex);
+                            dhum1 = new Thread(new Runnable() {
+                                public void run() {
+                                    try {
+                                        try {
+                                            try {
+                                                KeepChecking();
+                                            } catch (BadLocationException ex) {
+                                                Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.SEVERE, null, ex);
+                                            }
+                                        } catch (InterruptedException ex) {
+                                            Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.SEVERE, null, ex);
+                                        }
+                                    } catch (IOException ex) {
+                                        Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.SEVERE, null, ex);
+                                    }
+
                                 }
-                        } catch (InterruptedException ex) {
+                            });
+                            dhum1.start();
+                        } catch (Exception ex) {
                             Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.SEVERE, null, ex);
                         }
-                    } catch (IOException ex) {
+
+                    } catch (InterruptedException ex) {
                         Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.SEVERE, null, ex);
                     }
-
-                            }});
-                            dhum1.start();
-                    } catch (Exception ex) {
-                        Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-
-
-        } catch (InterruptedException ex) {
-            Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.SEVERE, null, ex);
-        }
-  //          catch (IOException ex) {
+                    //          catch (IOException ex) {
 //            Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.SEVERE, null, ex);
 //        }
-       }
+                }
 
-            private void KeepChecking() throws IOException, InterruptedException, BadLocationException {
-                //InputStream is = serialHelper.getSerialInputStream();
-                while(true){
-                    Thread.sleep(100);
-//                int y =serialHelper.getSerialInputStream().available();
-                if (serialHelper.data_available) {
-                    serialHelper.data_available=false;
-                    {
-                        byte[] p = new byte[serialHelper.len];
-                        System.out.println("Number of bytes seen = "+serialHelper.len);
-                        System.arraycopy(serialHelper.buffer, 0, p, 0, p.length);
-                        String hd ="";//new String(p);
-                        for(int v =0;v<p.length;v++){
-                            String kl = Byte.toString(p[v]);
-                            String m = Long.toHexString(Long.parseLong(kl));
-                            if(m.length()>2){
-                                m=m.substring(m.length()-2);
+                private void KeepChecking() throws IOException, InterruptedException, BadLocationException {
+                    //InputStream is = SerialHelper.getSerialInputStream();
+                    while (true) {
+                        Thread.sleep(100);
+//                int y =SerialHelper.getSerialInputStream().available();
+                        if (serialHelper.data_available) {
+                            serialHelper.data_available = false;
+                            {
+                                byte[] p = new byte[serialHelper.len];
+                                System.out.println("Number of bytes seen = " + serialHelper.len);
+                                System.arraycopy(serialHelper.buffer, 0, p, 0, p.length);
+                                String hd = "";//new String(p);
+                                for (int v = 0; v < p.length; v++) {
+                                    String kl = Byte.toString(p[v]);
+                                    String m = Long.toHexString(Long.parseLong(kl));
+                                    if (m.length() > 2) {
+                                        m = m.substring(m.length() - 2);
+                                    }
+                                    hd = hd.concat(" " + m);
+                                }
+                                //  logData += " : 0x" + Integer.toHexString(uartRxHandler.currentData[uartRxHandler.bytesToProcess  + i]).toUpperCase() + " ";
+                                String t = hd.toUpperCase();
+                                //                        if(t.length()>2){
+                                //                            t=t.substring(t.length()-2);
+                                //                        }
+                                //                        System.out.println(t);
+                                if (timeStampChkBx.isSelected()) {
+                                    doc.insertString(doc.getLength(), getDateTime(), Rx);
+                                }
+                                doc.insertString(doc.getLength(), t, Rx);
+                                // ZigBeeToolView.datatxnTxtArea.setText(  ZigBeeToolView.datatxnTxtArea.getText().concat(t));
                             }
-                            hd=hd.concat(" "+ m);
+                            doc.insertString(doc.getLength(), System.getProperty("line.separator"), Rx);
+                            datatxnTxtArea.setCaretPosition(datatxnTxtArea.getDocument().getLength());
+                            try {
+                                //
+                                //  is.reset();
+                                SerialHelper.getSerialInputStream().close();
+                                //  break;
+                            } catch (IOException ex) {
+                                Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.SEVERE, null, ex);
+                            }
                         }
-                        //  logData += " : 0x" + Integer.toHexString(uartRxHandler.currentData[uartRxHandler.bytesToProcess  + i]).toUpperCase() + " ";
-                        String t = hd.toUpperCase();
-                        //                        if(t.length()>2){
-                        //                            t=t.substring(t.length()-2);
-                        //                        }
-                        //                        System.out.println(t);
-                      if(timeStampChkBx.isSelected()){
-                           doc.insertString( doc.getLength(),getDateTime(),Rx);
-                       }
-                        doc.insertString(doc.getLength(), t, Rx);
-                       // ZigBeeToolView.datatxnTxtArea.setText(  ZigBeeToolView.datatxnTxtArea.getText().concat(t));
-                    }
-                     doc.insertString(doc.getLength(),System.getProperty("line.separator"), Rx);
-                    datatxnTxtArea.setCaretPosition(datatxnTxtArea.getDocument().getLength());
-                    try {
-                        //
-                        //  is.reset();
-                        serialHelper.getSerialInputStream().close();
-                        //  break;
-                    } catch (IOException ex) {
-                        Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
-       }
-            }
-        });
-       dhum.start();
+            });
+            dhum.start();
 
-    }
+        }
     }//GEN-LAST:event_btnConfigureDeviceActionPerformed
 
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
-       deviceStatusFrame dq = new deviceStatusFrame();
-       dq.setLocationRelativeTo(this.getFrame());
-       dq.setVisible(true);
+        deviceStatusFrame dq = new deviceStatusFrame();
+        dq.setLocationRelativeTo(this.getFrame());
+        dq.setVisible(true);
 
     }//GEN-LAST:event_jMenuItem3ActionPerformed
 
@@ -1193,38 +1182,38 @@ if(rBtnCoOrd.isSelected()){
     }//GEN-LAST:event_jCheckBox1ActionPerformed
 
     private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem6ActionPerformed
-      FileDialog fileDialog = new FileDialog(new Frame(), "Save the text file...", FileDialog.SAVE);
+        FileDialog fileDialog = new FileDialog(new Frame(), "Save the text file...", FileDialog.SAVE);
         fileDialog.setFilenameFilter(new FilenameFilter() {
             public boolean accept(File dir, String name) {
                 return name.endsWith(".txt");
             }
         });
         String fName = getDateTime();
-        fName= fName.replace(":", "-");
-        fName= "ZigBee"+fName.replace(" ", "");
-        
-        fileDialog.setFile(fName+".txt");
+        fName = fName.replace(":", "-");
+        fName = "ZigBee" + fName.replace(" ", "");
+
+        fileDialog.setFile(fName + ".txt");
 
         fileDialog.setLocationByPlatform(true);
         fileDialog.setVisible(true);
-       
-        String directory= fileDialog.getDirectory();
 
-        String fileName=fileDialog.getFile();
-        if(directory!=null){
-        directory=directory.replace(File.separatorChar, '\\');
+        String directory = fileDialog.getDirectory();
 
-        fileName=fileName.replace(File.separatorChar, '\\');
-         String fullPath = directory + "\\"+fileName;
-        File p = new File(fullPath);
-        try {
-            p.createNewFile();
-        } catch (IOException ex) {
-            Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        FileOutputStream report = null;
+        String fileName = fileDialog.getFile();
+        if (directory != null) {
+            directory = directory.replace(File.separatorChar, '\\');
+
+            fileName = fileName.replace(File.separatorChar, '\\');
+            String fullPath = directory + "\\" + fileName;
+            File p = new File(fullPath);
             try {
-               report = new FileOutputStream(p);
+                p.createNewFile();
+            } catch (IOException ex) {
+                Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            FileOutputStream report = null;
+            try {
+                report = new FileOutputStream(p);
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -1238,11 +1227,10 @@ if(rBtnCoOrd.isSelected()){
         }
 
 
-        
     }//GEN-LAST:event_jMenuItem6ActionPerformed
 
     private void dataFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataFieldActionPerformed
- 
+
     }//GEN-LAST:event_dataFieldActionPerformed
 
     private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem5ActionPerformed
@@ -1253,51 +1241,44 @@ if(rBtnCoOrd.isSelected()){
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
 
-
-         byte[] sendBytes = new byte[dataField.getText().length()/2];
+        byte[] sendBytes = new byte[dataField.getText().length() / 2];
         try {
             byte[] kl = dataField.getText().getBytes("UTF-8");
-          System.out.print("hhh");
+            System.out.print("hhh");
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.SEVERE, null, ex);
         }
-        long h= Long.parseLong(dataField.getText(),16);
-        for(int y=dataField.getText().length()/2;y>0;y--){
-            sendBytes[y-1]=(byte) (h & 0xff);
-            h=h>>8;
+        long h = Long.parseLong(dataField.getText(), 16);
+        for (int y = dataField.getText().length() / 2; y > 0; y--) {
+            sendBytes[y - 1] = (byte) (h & 0xff);
+            h = h >> 8;
         }
-        final byte[] newAF_data = new byte[15+sendBytes.length];
+        final byte[] newAF_data = new byte[15 + sendBytes.length];
         System.arraycopy(AF_Data, 0, newAF_data, 0, newAF_data.length);
         newAF_data[13] = (byte) (sendBytes.length);
-        newAF_data[1] = (byte) (sendBytes.length+10);
+        newAF_data[1] = (byte) (sendBytes.length + 10);
         System.arraycopy(sendBytes, 0, newAF_data, 14, sendBytes.length);
 
-        newAF_data[newAF_data.length-1] = checksumCalculator(newAF_data);
+        newAF_data[newAF_data.length - 1] = checksumCalculator(newAF_data);
 
-        
+        Thread ted = new Thread(new Runnable() {
 
+            public void run() {
+                //   ListSerialPorts();
+                if (!jCheckBox1.isSelected()) {
+                    long j = Long.parseLong(jTextField2.getText());
+                    for (int n = 0; n < j; n++) {
 
-         Thread ted = new Thread(new Runnable() {
-
-        public void run()
-        {
-        //   ListSerialPorts();
-            if(!jCheckBox1.isSelected())  {
-               long j =  Long.parseLong(jTextField2.getText());
-               for(int n =0; n<j;n++){
-
-               sendThis(newAF_data, 100);
+                        sendThis(newAF_data, 100);
+                    }
                 }
+
             }
-
-        }
-         });
-         ted.start();
-
-     
+        });
+        ted.start();
 
 //        OutputStream os = serialHelper.getSerialOutputStream();
-//        InputStream is = serialHelper.getSerialInputStream();
+//        InputStream is = SerialHelper.getSerialInputStream();
     }//GEN-LAST:event_jButton1ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -1376,35 +1357,30 @@ if(rBtnCoOrd.isSelected()){
         group.add(rBtnRouter);
         rBtnCoOrd.setSelected(true);
 
+        ButtonGroup dataFormat = new ButtonGroup();
+        dataFormat.add(jRadioButton4);
+        dataFormat.add(jRadioButton5);
+        dataFormat.add(jRadioButton6);
+        jRadioButton6.setSelected(true);
 
-         ButtonGroup dataFormat = new ButtonGroup();
-         dataFormat.add(jRadioButton4);
-         dataFormat.add(jRadioButton5);
-         dataFormat.add(jRadioButton6);
-         jRadioButton6.setSelected(true);
-
-         ButtonGroup pattern = new ButtonGroup();
-         pattern.add(jRadioButton1);
-          pattern.add(jRadioButton2);
-           pattern.add(jRadioButton3);
-            jRadioButton1.setSelected(true);
-
+        ButtonGroup pattern = new ButtonGroup();
+        pattern.add(jRadioButton1);
+        pattern.add(jRadioButton2);
+        pattern.add(jRadioButton3);
+        jRadioButton1.setSelected(true);
 
         // group read/write  button
 //        buttonGroup1.add(radBtnRead);
 //        buttonGroup1.add(radBtnWrite);
-      //  EnableDisableCalButtons(false);
-         Thread ted = new Thread(new Runnable() {
+        //  EnableDisableCalButtons(false);
+        Thread ted = new Thread(new Runnable() {
 
-        public void run()
-        {
-           ListSerialPorts();
-        }
-         });
-         ted.start();
-     
+            public void run() {
+                ListSerialPorts();
+            }
+        });
+        ted.start();
 
-       
     }
 
     private void ListSerialPorts() {
@@ -1412,54 +1388,48 @@ if(rBtnCoOrd.isSelected()){
         lblStatus.setText("Detecting serial ports in this machine...");
         lblStatus.setForeground(Color.BLUE);
 
-          Thread te = new Thread(new Runnable() {
+        Thread te = new Thread(new Runnable() {
 
-        public void run()
-        {
-           progressBar.setIndeterminate(true);
-         String[] serialPorts  = serialHelper.getSerialPorts();
+            public void run() {
+                progressBar.setIndeterminate(true);
+                String[] serialPorts = serialHelper.getSerialPorts();
 
-         if(serialPorts.length==0){
+                if (serialPorts.length == 0) {
 
-             lblStatus.setText("No Communication port available. Please connect one and restart application.");
-             lblStatus.setForeground(Color.red);
-             connectBtn.setEnabled(false);
-         }
- else{
-             connectBtn.setEnabled(true);
- }
-
-        cmbComSelector.removeAllItems();
-       // cmbComSelector.addItem("Select COM Port");
-        if (serialPorts != null)
-        {
-                for (int i = 0; i < serialPorts.length; i++)
-                {
-                    cmbComSelector.addItem(serialPorts[i]);
+                    lblStatus.setText("No Communication port available. Please connect one and restart application.");
+                    lblStatus.setForeground(Color.red);
+                    connectBtn.setEnabled(false);
+                } else {
+                    connectBtn.setEnabled(true);
                 }
 
-        }
-        else
-        {
-            EnableDisableCalButtons(false);
-            lblStatus.setText("No serial ports available");
-        }
+                cmbComSelector.removeAllItems();
+                // cmbComSelector.addItem("Select COM Port");
+                if (serialPorts != null) {
+                    for (int i = 0; i < serialPorts.length; i++) {
+                        cmbComSelector.addItem(serialPorts[i]);
+                    }
 
-        ZigBeeToolApp.getApplication().view.getFrame().repaint();
+                } else {
+                    EnableDisableCalButtons(false);
+                    lblStatus.setText("No serial ports available");
+                }
 
-          if(serialPorts.length==1){
-             lblStatus.setText("Only 1 Com port avialable - "+ serialPorts[0]);
-             connectBtn.doClick();
-          }
- else{
-           lblStatus.setText("Avaialble Com Ports : "+serialPorts.length) ;
- }
+                ZigBeeToolApp.getApplication().view.getFrame().repaint();
 
-progressBar.setIndeterminate(false);
-              }});
+                if (serialPorts.length == 1) {
+                    lblStatus.setText("Only 1 Com port avialable - " + serialPorts[0]);
+                    connectBtn.doClick();
+                } else {
+                    lblStatus.setText("Avaialble Com Ports : " + serialPorts.length);
+                }
 
-              te.start();
-        
+                progressBar.setIndeterminate(false);
+            }
+        });
+
+        te.start();
+
     }
 
     private void EnableDisableCalButtons(boolean b) {
@@ -1470,72 +1440,68 @@ progressBar.setIndeterminate(false);
         extPanIDtxtField.setEnabled(b);
         dataField.setEnabled(b);
         jTextField2.setEnabled(b);
-       // jButton1.setEnabled(b);
-
+        // jButton1.setEnabled(b);
 
     }
 
-    public void lblStatus(String string,Color g,int time){
-        Icon ic=null;
+    public void lblStatus(String string, Color g, int time) {
+        Icon ic = null;
         lblStatus.setForeground(g);//setBackground(g);
         lblStatus.setText(string);
-         lblStatus.setVisible(true);
-        if(g==Color.RED){
-         // ic=ProdProgrammerApp.getApplication().getView().getres().getIcon("wrong.icon");
-         // viewModeBtn.setIcon(resourceMap.getIcon("lessImage.icon"));
+        lblStatus.setVisible(true);
+        if (g == Color.RED) {
+            // ic=ProdProgrammerApp.getApplication().getView().getres().getIcon("wrong.icon");
+            // viewModeBtn.setIcon(resourceMap.getIcon("lessImage.icon"));
 
+        } else {
+            // ic=ProdProgrammerApp.getApplication().getView().getres().getIcon("correct.icon");
         }
- else{
-          // ic=ProdProgrammerApp.getApplication().getView().getres().getIcon("correct.icon");
-       }
-       lblStatus.setIcon(ic);
+        lblStatus.setIcon(ic);
         try {
             Thread.sleep(time);
         } catch (InterruptedException ex) {
-           // Exceptions.printStackTrace(ex);
+            // Exceptions.printStackTrace(ex);
         }
-       if(time!=0){
-       lblStatus.setText("");
-        lblStatus.setIcon(null);
-         lblStatus.setVisible(false);
+        if (time != 0) {
+            lblStatus.setText("");
+            lblStatus.setIcon(null);
+            lblStatus.setVisible(false);
         }
     }
 
-     private void GiveResponse(final String string, final Color color) {
-          Thread te = new Thread(new Runnable() {
+    private void GiveResponse(final String string, final Color color) {
+        Thread te = new Thread(new Runnable() {
 
-        public void run()
-        {
-        lblStatus(string, color,3000);
-        }
-         });
-         te.start();
+            public void run() {
+                lblStatus(string, color, 3000);
+            }
+        });
+        te.start();
     }
 
-       private  final static String getDateTime()
-{
+    private final static String getDateTime() {
 
-    DateFormat df = new SimpleDateFormat("HH:mm:ss -");
-   // df.setTimeZone(TimeZone.getgetTimeZone("PST"));
-    return df.format(new Date());
-}
+        DateFormat df = new SimpleDateFormat("HH:mm:ss -");
+        // df.setTimeZone(TimeZone.getgetTimeZone("PST"));
+        return df.format(new Date());
+    }
 
-    private boolean sendThis(byte[] command , int com) {
-        boolean  ret=false;
+    private boolean sendThis(byte[] command, int com) {
+        boolean ret = false;
         int failed = 0;
-          currentSending=command;
-          String q = "";
-          for(int v =0;v<command.length;v++){
-                            String kl = Byte.toString(command[v]);
-                            String m = Long.toHexString(Long.parseLong(kl));
-                            if(m.length()>2){
-                                m=m.substring(m.length()-2);
-                            }
-                            if(m.length()<2){
-                                m="0".concat(m);
-                            }
-                            q=q.concat(" "+ m);
-                        }
+        currentSending = command;
+        String q = "";
+        for (int v = 0; v < command.length; v++) {
+            String kl = Byte.toString(command[v]);
+            String m = Long.toHexString(Long.parseLong(kl));
+            if (m.length() > 2) {
+                m = m.substring(m.length() - 2);
+            }
+            if (m.length() < 2) {
+                m = "0".concat(m);
+            }
+            q = q.concat(" " + m);
+        }
         try {
             doc.insertString(doc.getLength(), getDateTime(), Tx);
             doc.insertString(doc.getLength(), q.toUpperCase(), Tx);
@@ -1545,143 +1511,141 @@ progressBar.setIndeterminate(false);
         } catch (BadLocationException ex) {
             Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.SEVERE, null, ex);
         }
-       //  memviewMode();
+        //  memviewMode();
 
-         try{
-        progressBar.setIndeterminate(true);
-        EnableDisableCalButtons(false);
-        while(failed<10){
-            try {
+        try {
+            progressBar.setIndeterminate(true);
+            EnableDisableCalButtons(false);
+            while (failed < 10) {
+                try {
 
-                serialHelper.getSerialOutputStream().flush();// is.reset();
-                serialHelper.getSerialOutputStream().write(currentSending);
-            } catch (IOException ex) {
-             //   Logger.getLogger(EnergyMeterFrame.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            //Thread.sleep(400);
-            try {
-                
-                if ( serialHelper.data_available) {
-                    serialHelper.data_available=false;
-                    {
-                        byte[] p = new byte[serialHelper.len];
-                        System.out.println("Number of bytes seen = "+serialHelper.len);
-                        System.arraycopy(serialHelper.buffer, 0, p, 0, p.length);
-                       
-                        serialHelper.getSerialInputStream().read(p);
-                        responseProcessor rp = new responseProcessor();
-                        resp = new responseStruct();
+                    SerialHelper.getSerialOutputStream().flush();// is.reset();
+                    SerialHelper.getSerialOutputStream().write(currentSending);
+                } catch (IOException ex) {
+                    //   Logger.getLogger(EnergyMeterFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                //Thread.sleep(400);
+                try {
 
-                        resp.startByte = p[0];
-                        resp.cmdLength = p[1];
-                        resp.cmd0 = p[2];
-                        resp.cmd1 =  p[3];
-                        resp.dataBuffer = new byte[resp.cmdLength];
-                        System.arraycopy(p, 4, resp.dataBuffer, 0, resp.cmdLength);
-                        resp.checksum = p[p.length-1];
+                    if (serialHelper.data_available) {
+                        serialHelper.data_available = false;
+                        {
+                            byte[] p = new byte[serialHelper.len];
+                            System.out.println("Number of bytes seen = " + serialHelper.len);
+                            System.arraycopy(serialHelper.buffer, 0, p, 0, p.length);
 
-                        if(rp.processData(com , resp) == 1) ret = true;
+                            SerialHelper.getSerialInputStream().read(p);
+                            responseProcessor rp = new responseProcessor();
+                            resp = new responseStruct();
 
+                            resp.startByte = p[0];
+                            resp.cmdLength = p[1];
+                            resp.cmd0 = p[2];
+                            resp.cmd1 = p[3];
+                            resp.dataBuffer = new byte[resp.cmdLength];
+                            System.arraycopy(p, 4, resp.dataBuffer, 0, resp.cmdLength);
+                            resp.checksum = p[p.length - 1];
 
-
-
-                        String hd ="";//new String(p);
-                        for(int v =0;v<p.length;v++){
-                            String kl = Byte.toString(p[v]);
-                            String m = Long.toHexString(Long.parseLong(kl));
-                            if(m.length()>2){
-                                m=m.substring(m.length()-2);
+                            if (rp.processData(com, resp) == 1) {
+                                ret = true;
                             }
-                            if(m.length()<2){
-                                m = "0".concat(m);
+
+                            String hd = "";//new String(p);
+                            for (int v = 0; v < p.length; v++) {
+                                String kl = Byte.toString(p[v]);
+                                String m = Long.toHexString(Long.parseLong(kl));
+                                if (m.length() > 2) {
+                                    m = m.substring(m.length() - 2);
+                                }
+                                if (m.length() < 2) {
+                                    m = "0".concat(m);
+                                }
+                                hd = hd.concat(" " + m);
                             }
-                            hd=hd.concat(" "+ m);
+                            //  logData += " : 0x" + Integer.toHexString(uartRxHandler.currentData[uartRxHandler.bytesToProcess  + i]).toUpperCase() + " ";
+                            String t = hd.toUpperCase();
+                            //                        if(t.length()>2){
+                            //                            t=t.substring(t.length()-2);
+                            //                        }
+                            //                        System.out.println(t);
+                            if (timeStampChkBx.isSelected()) {
+                                doc.insertString(doc.getLength(), getDateTime(), Rx);
+                            }
+                            doc.insertString(doc.getLength(), t, Rx);
+                            // ZigBeeToolView.datatxnTxtArea.setText(  ZigBeeToolView.datatxnTxtArea.getText().concat(t));
                         }
-                        //  logData += " : 0x" + Integer.toHexString(uartRxHandler.currentData[uartRxHandler.bytesToProcess  + i]).toUpperCase() + " ";
-                        String t = hd.toUpperCase();
-                        //                        if(t.length()>2){
-                        //                            t=t.substring(t.length()-2);
-                        //                        }
-                        //                        System.out.println(t);
-                       if(timeStampChkBx.isSelected()){
-                           doc.insertString( doc.getLength(),getDateTime(),Rx);
-                       }
-                        doc.insertString(doc.getLength(), t,Rx );
-                       // ZigBeeToolView.datatxnTxtArea.setText(  ZigBeeToolView.datatxnTxtArea.getText().concat(t));
-                    }
-                     doc.insertString(doc.getLength(),System.getProperty("line.separator"), Rx);
+                        doc.insertString(doc.getLength(), System.getProperty("line.separator"), Rx);
 
 //                    ZigBeeToolView.datatxnTxtArea.setText(  ZigBeeToolView.datatxnTxtArea.getText().concat(System.getProperty("line.separator")));
-                    datatxnTxtArea.setCaretPosition(datatxnTxtArea.getDocument().getLength());
+                        datatxnTxtArea.setCaretPosition(datatxnTxtArea.getDocument().getLength());
 //
-                    //  is.reset();
-                    serialHelper.getSerialInputStream().close();
-                    break;
+                        //  is.reset();
+                        SerialHelper.getSerialInputStream().close();
+                        break;
+                    }
+                    // serialHelper.disconnect();
+                    failed++;
+                    //   firmwareHandler.WriteRequest(sendBytes);
+                } catch (IOException ex) {
+                    Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.SEVERE, null, ex);
                 }
-               // serialHelper.disconnect();
-                failed++;
-                //   firmwareHandler.WriteRequest(sendBytes);
-            } catch (IOException ex) {
-                Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.SEVERE, null, ex);
             }
+            if (failed == 10) {
+                GiveResponse("Attempted 10 times, but failed", Color.RED);
+                checksum.yield();
+
+            } else {
+
+            }
+            progressBar.setIndeterminate(false);
+            EnableDisableCalButtons(true);
+
+        } catch (NumberFormatException chksum) {
+            //   lblChecksumValue.setText(" N/A");
+
+        } catch (BadLocationException chksum) {
+            //   lblChecksumValue.setText(" N/A");
         }
-        if(failed==10){
-           GiveResponse("Attempted 10 times, but failed", Color.RED);
-           checksum.yield();
-
-        }
- else {
-
- }
-        progressBar.setIndeterminate(false);
-        EnableDisableCalButtons(true);
-
-                }catch(Exception chksum){
-              //   lblChecksumValue.setText(" N/A");
-
-                }
 
 //                 }});
 //                 checksum.start();
-
-          return ret;
+        return ret;
     }
 
-    byte checksumCalculator(byte[] p){
-        byte ret= 0;
-        byte[] newByte = new byte[p.length-2];
+    byte checksumCalculator(byte[] p) {
+        byte ret = 0;
+        byte[] newByte = new byte[p.length - 2];
         System.arraycopy(p, 1, newByte, 0, newByte.length);
-        for(int y=0;y<newByte.length;y++){
-           
+        for (int y = 0; y < newByte.length; y++) {
+
             ret ^= newByte[y];
         }
 
         return ret;
 
-
     }
 
-  public String sendCmd(byte[] command , int com) {
-        boolean  ret=false;
+    public String sendCmd(byte[] command, int com) {
+        boolean ret = false;
         int failed = 0;
-         String t="";
-          currentSending=command;
-        try{
-        EnableDisableCalButtons(false);
-        OutputStream os = serialHelper.getSerialOutputStream();
-        InputStream is = serialHelper.getSerialInputStream();
-        while(failed<100){
-            try {
+        String t = "";
+        currentSending = command;
+        try {
+            EnableDisableCalButtons(false);
+            OutputStream os = SerialHelper.getSerialOutputStream();
+            InputStream is = serialHelper.getSerialInputStream();
+            while (failed < 100) {
+                try {
 
-                os.flush();// is.reset();
-                os.write(currentSending);
-            } catch (IOException ex) {
-             }
-            Thread.sleep(400);
-            try {
-                is=is = serialHelper.getSerialInputStream();
-                int y =is.available();
-                if ( y!= 0) {
+                    os.flush();// is.reset();
+                    os.write(currentSending);
+                } catch (IOException ex) {
+                }
+                Thread.sleep(400);
+                try {
+                    is = SerialHelper.getSerialInputStream();
+                    int y = is.available();
+                    if (y != 0) {
                         byte[] p = new byte[y];
                         is.read(p);
                         responseProcessor rp = new responseProcessor();
@@ -1689,82 +1653,80 @@ progressBar.setIndeterminate(false);
                         resp.startByte = p[0];
                         resp.cmdLength = p[1];
                         resp.cmd0 = p[2];
-                        resp.cmd1 =  p[3];
+                        resp.cmd1 = p[3];
                         resp.dataBuffer = new byte[resp.cmdLength];
                         System.arraycopy(p, 4, resp.dataBuffer, 0, resp.cmdLength);
-                        resp.checksum = p[p.length-1];
-                        if(rp.processData(com , resp) == 1) ret = true;
-                        String hd ="";//new String(p);
-                        for(int v =0;v<p.length;v++){
+                        resp.checksum = p[p.length - 1];
+                        if (rp.processData(com, resp) == 1) {
+                            ret = true;
+                        }
+                        String hd = "";//new String(p);
+                        for (int v = 0; v < p.length; v++) {
                             String kl = Byte.toString(p[v]);
                             String m = Long.toHexString(Long.parseLong(kl));
-                            if(m.length()>2){
-                                m=m.substring(m.length()-2);
+                            if (m.length() > 2) {
+                                m = m.substring(m.length() - 2);
                             }
-                            hd=hd.concat(" "+ m);
+                            hd = hd.concat(" " + m);
                         }
-                          t = hd.toUpperCase();
+                        t = hd.toUpperCase();
 
-
-                    is.close();
-                    return t;
-                   // break;
+                        is.close();
+                        return t;
+                        // break;
+                    }
+                    // serialHelper.disconnect();
+                    failed++;
+                    //   firmwareHandler.WriteRequest(sendBytes);
+                } catch (IOException ex) {
+                    //    Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.SEVERE, null, ex);
                 }
-               // serialHelper.disconnect();
-                failed++;
-                //   firmwareHandler.WriteRequest(sendBytes);
-            } catch (IOException ex) {
-            //    Logger.getLogger(ZigBeeToolView.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
-        if(failed==100){
-          return "failed..";
+            if (failed == 100) {
+                return "failed..";
+
+            } else {
+
+            }
+            progressBar.setIndeterminate(false);
+            EnableDisableCalButtons(true);
+
+        } catch (Exception chksum) {
+            //   lblChecksumValue.setText(" N/A");
 
         }
- else {
-
- }
-        progressBar.setIndeterminate(false);
-        EnableDisableCalButtons(true);
-
-                }catch(Exception chksum){
-              //   lblChecksumValue.setText(" N/A");
-
-                }
 
 //                 }});
 //                 checksum.start();
-
-          return t ;
+        return t;
     }
 
+    private void sound(int hz, int msecs, double vol)
+            throws IllegalArgumentException, LineUnavailableException {
 
-     private void sound(int hz, int msecs, double vol)
-throws IllegalArgumentException, LineUnavailableException {
+        if (vol > 1.0 || vol < 0.0) {
+            throw new IllegalArgumentException("Volume out of range 0.0- 1.0");
+        }
+        byte[] buf = new byte[msecs * 8];
 
-if (vol > 1.0 || vol < 0.0)
-throw new IllegalArgumentException("Volume out of range 0.0- 1.0");
+        for (int i = 0; i < buf.length; i++) {
+            double angle = i / (8000.0 / hz) * 2.0 * Math.PI;
+            buf[i] = (byte) (Math.sin(angle) * 127.0 * vol);
+        }
 
-byte[] buf = new byte[msecs * 8];
+        // shape the front and back ends of the wave form
+        for (int i = 0; i < 20 && i < buf.length / 2; i++) {
+            buf[i] = (byte) (buf[i] * i / 20);
+            buf[buf.length - 1 - i] = (byte) (buf[buf.length - 1 - i]
+                    * i / 20);
+        }
 
-for (int i=0; i<buf.length; i++) {
-double angle = i / (8000.0 / hz) * 2.0 * Math.PI;
-buf[i] = (byte)(Math.sin(angle) * 127.0 * vol);
-}
-
-// shape the front and back ends of the wave form
-for (int i=0; i<20 && i < buf.length / 2; i++) {
-buf[i] = (byte)(buf[i] * i / 20);
-buf[buf.length - 1 - i] = (byte)(buf[buf.length - 1 - i] *
-i / 20);
-}
-
-AudioFormat af = new AudioFormat(8000f,8,1,true,false);
-SourceDataLine sdl = AudioSystem.getSourceDataLine(af);
-sdl.open(af);
-sdl.start();
-sdl.write(buf,0,buf.length);
-sdl.drain();
-sdl.close();
-}
+        AudioFormat af = new AudioFormat(8000f, 8, 1, true, false);
+        SourceDataLine sdl = AudioSystem.getSourceDataLine(af);
+        sdl.open(af);
+        sdl.start();
+        sdl.write(buf, 0, buf.length);
+        sdl.drain();
+        sdl.close();
+    }
 }
