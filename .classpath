@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="dist/lib/appframework-1.0.3.jar"/>
+	<classpathentry kind="lib" path="dist/lib/rxtx-2.1-7-bins-r2/RXTXcomm-debug.jar"/>
+	<classpathentry kind="lib" path="dist/lib/rxtx-2.1-7-bins-r2/RXTXcomm.jar"/>
+	<classpathentry kind="lib" path="dist/lib/rxtx-2.2pre2-bins/rxtx_2_2p2_mac_iharder.jar"/>
+	<classpathentry kind="lib" path="dist/lib/rxtx-2.2pre2-bins/RXTXcomm-debug.jar"/>
+	<classpathentry kind="lib" path="dist/lib/rxtx-2.2pre2-bins/RXTXcomm.jar"/>
+	<classpathentry kind="lib" path="dist/lib/RXTXcomm.jar"/>
+	<classpathentry kind="lib" path="dist/lib/swing-worker-1.1.jar"/>
+	<classpathentry kind="lib" path="dist/lib/toplink-essentials-agent.jar"/>
+	<classpathentry kind="lib" path="dist/lib/toplink-essentials.jar"/>
+	<classpathentry kind="lib" path="dist/ZigBee Tool.jar"/>
+	<classpathentry kind="output" path="build/classes"/>
+</classpath>
